@@ -57,6 +57,9 @@ args_format = {}
 from random import randint
 # If I can be SO fr right now, I don't know how this works anymore.
 # It looks like the code equivalent of a bunch of wires.
+
+args_format.update({"wait":"<no args, does all unit conversions needed>"})
+
 async def parse(command: str, first_time=True) -> str:
     """Parses out and runs command passed in, and returns the response as a String to be read by TTS.
     Format goes: "command;arg1 arg2 arg3" """
