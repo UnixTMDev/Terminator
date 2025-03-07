@@ -228,7 +228,7 @@ def google_search_in_browser(args: str) -> str:
     firefox.open_new(new_url)
     return "Alright."
 args_format.update({"search":"<user's search query>"})
-search = google_search
+search = google_search_in_browser
 
 from imports.pokemon import arg_format as pokedex_args_format
 args_format.update({"pokedex":pokedex_args_format})
