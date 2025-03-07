@@ -2,13 +2,13 @@
 # All caps-labeled items should be kept secret from others.
 
 ##Keys/tokens for services that Terminator can use.
-from secrets import HOME_ASSISTANT_TOKEN, WOLFRAM_KEY
+from secrets_real import HOME_ASSISTANT_TOKEN, WOLFRAM_KEY
 
 #Notes about yourself, maybe this'll help the LLM figure out the command.
-from secrets import UserInfo
+from secrets_real import UserInfo
 
 #What is your home city?
-from secrets import HomeCity
+from secrets_real import HomeCity
 
 #Terminator misrecognizes what you want sometimes, add commands here that you want to double-check the validity of.
 UnwantedMisfires = ["launch","open_program","run_program","wikipedia", "light","audio_source","headphones","speaker",'lock_computer', 'wikipedia',"time"]
