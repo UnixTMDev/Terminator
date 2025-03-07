@@ -219,7 +219,7 @@ def wikipedia(args: str) -> str:
         return "Not found homeboy"
 
 args_format.update({"google_search_in_browser":"<user's search query>"})
-def google_search(args: str) -> str:
+def google_search_in_browser(args: str) -> str:
     firefox = webbrowser.Mozilla("/home/unix/.nix-profile/bin/firefox")
     query = args.lstrip().rstrip().replace(" ","+")
     ##print(query,"/args:",args)
