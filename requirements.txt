@@ -1,0 +1,11 @@
+rapidfuzz
+websockets
+requests
+youtube_search
+wikipedia
+gpustat
+RealtimeSTT
+pyautogui
+python-steam-api
+pokebase
+wolframalpha

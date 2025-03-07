@@ -1,0 +1,8 @@
+Terminator Voice Assistant
+(Formerly JARVIS v2.0)
+Version 1.0
+Made by: UnixTMDev <unix@unixtm.dev>
+GPU 0: NVIDIA GeForce RTX 4070 SUPER, Utilization: 5%
+Listening for wake word...
+Recording...
+User stopped speaking, transcribing.

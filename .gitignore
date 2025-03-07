@@ -1,0 +1,5 @@
+secrets.py
+__pycache__/
+junk/
+realtimesst.log
+*est*
