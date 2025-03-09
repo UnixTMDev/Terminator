@@ -243,6 +243,11 @@ from imports.pokemon import pokedex
 #args_format.update({"web":"<user-provided URL>"})
 #web = open_url
 
+args_format.update({"random":"<Lower Bound, inclusive>:<Higher Bound, inclusive>"})
+async def random(args):
+    asdf = args.split(":")
+    return randint(int(asdf[0]),int(asdf[1]))
+
 args_format.update({"wolfram":"<Wolfram Alpha query, usually unit conversions or other simple questions>"})
 async def wolfram(args):
     if "weather" in args.lower():
