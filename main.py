@@ -93,6 +93,7 @@ class MyTUI(App):
         """Capture stdout/stderr and write to log."""
         log_widget = self.query_one("#debug", Log)
         log_widget.write(message.strip()+"\n")  # Strip extra newlines
+        self.file.write(f"STDOUT -> {message}")
         #asyncio.run(self.refresh())
 
     def flush(self):
