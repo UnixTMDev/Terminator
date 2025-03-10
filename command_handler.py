@@ -243,7 +243,7 @@ from imports.pokemon import pokedex
 #args_format.update({"web":"<user-provided URL>"})
 #web = open_url
 
-args_format.update({"random":"<Lower Bound, inclusive>:<Higher Bound, inclusive>"})
+args_format.update({"random":"<lower and higher bound, both inclusive, separated by a colon>"})
 async def random(args):
     asdf = args.split(":")
     return randint(int(asdf[0]),int(asdf[1]))
