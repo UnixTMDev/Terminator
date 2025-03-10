@@ -326,7 +326,7 @@ async def forecast_hourly(args: str) -> str:
     # str(datetime.date.today().strftime("%a"))
     for day in weather:
         for hour in day:
-            huor = hour.date.strftime("%H")
+            huor = hour.time.strftime("%H")
             filtered_chances = {
                 attr: getattr(hour, attr)
                 for attr in dir(hour)
