@@ -124,22 +124,13 @@ import command_handler as cmd_parser
 not_ideal_misfires = ["suicide","cancel","invalid","exit_program","pause_listening","close_program","stop_program","open_url"]
 for x in UnwantedMisfires: not_ideal_misfires.append(x)
 
-# It can be called over WS, after all.
 async def callbacklol(command, remote=False):
     global tts
     await ui.log_text("#userWords",f"{'<' if not any(w in command.lower() for w in WakeWords.split(',')) else '<<'} \"{command}\"")
     if not any(w in command.lower() for w in WakeWords.split(',')) and remote == False:
         return
     if any(w in command.lower() for w in WakeWords.split(',')):
-        tts.stop()
-
-    #asdf
-    #comd2 = command
-    #for w in WakeWords.split(','):
-    #    comd2 = comd2.replace(w,"")
-    #if comd2.strip() == "" or len(comd2.strip()) > 8:
-    #    return ""
-    #asdf    
+        tts.stop()   
 
     command_list = "The valid commands and their argument formats are:"
     for x in list(cmd_parser.args_format.keys()):

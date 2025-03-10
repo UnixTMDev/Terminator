@@ -288,17 +288,6 @@ def exec_file(a):
 def exec_file2(a):
     return str(runSwagReal(["bash","-c",a], stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL))
 
-#args_format.update({"exit_program":"<ignores arguments, put whatever>"})
-#def exit_program(args: str) -> str:
-    #with pyautogui.hold('alt'):
-    #    pyautogui.press('f4')
-#    with pyautogui.hold("super"):
-#        pyautogui.press(["shift","q"])
-#    return "Did it work? Just kidding, I don't care."
-#args_format.update({"close_program":"<ignores arguments, put whatever>"})
-#close_program = exit_program
-#args_format.update({"stop_program":"<ignores arguments, put whatever>"})
-#stop_program = exit_program
 
 args_format.update({"weather":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
 import python_weather
@@ -314,6 +303,31 @@ async def weather(args: str) -> str:
     wind direction: {str(weather.wind_direction)}, wind speed: {weather.wind_speed} mph
     """
 
+args_format.update({"forecast_daily":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
+import python_weather
+async def forecast_daily(args: str) -> str:
+    async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
+        # fetch a weather forecast from a city
+        weather = await client.get(HomeCity)
+    forecasts = {}
+    # str(datetime.date.today().strftime("%a"))
+    for day in weather:
+        forecasts[day.date.strftime("%a")] = f"High of {day.highest_temperature} and low of {day.lowest_temperature}, moon is {str(day.moon_phase)}."
+    return str(forecasts)
+
+#args_format.update({"forecast_hourly":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
+import python_weather
+async def forecast_hourly(args: str) -> str:
+    async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
+        # fetch a weather forecast from a city
+        weather = await client.get(HomeCity)
+    return f"""{weather.temperature} Fahrenheit and {str(weather.kind)}.
+    (extraneous data, only tell if user wanted any of the following:) description: {str(weather.description)}, feels like: {str(weather.feels_like)} F,
+    humidity: {weather.humidity}, precipitation: {weather.precipitation} inches,
+    pressure: {weather.pressure} inches, visibility: {weather.visibility} miles,
+    ultraviolet: {str(weather.ultraviolet)},
+    wind direction: {str(weather.wind_direction)}, wind speed: {weather.wind_speed} mph
+    """
 
 #Holy Christ
 import json
@@ -351,7 +365,6 @@ def light(args: str) -> str:
             set_device_state('on', TargetDevice)
     return "K."
 
-#os.system("nircmd.exe setdefaultsounddevice \"" + audio_devices[current_device] + "\"")
 from rapidfuzz import fuzz
 import os
 def find_best_match(query, options):
