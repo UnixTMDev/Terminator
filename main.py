@@ -67,13 +67,14 @@ class MyTUI(App):
         )
 
     runningReal = False
-    file = open("log.txt","w")
+    
 
     def on_mount(self):
         self.runningReal = True
         self.screen.styles.background = Color.parse("#34027a")
         # Redirect stdout and stderr
         #f = open("log.txt","w")
+        self.file = open("log.txt","w")
         sys.stdout = self
         sys.stderr = self
 
@@ -109,7 +110,7 @@ class MyTUI(App):
         log_widget.write(message + "\n")  # Append new line
         log_widget.scroll_end()  # Forces it to scroll down
         self.refresh()
-        self.file.write(f"{log_id} -> {message}")
+        print(self.file.write(f"{log_id} -> {message}\n"))
 
     log_text = log_message
     
