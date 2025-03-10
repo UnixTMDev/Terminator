@@ -322,13 +322,19 @@ async def forecast_hourly(args: str) -> str:
     async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
         # fetch a weather forecast from a city
         weather = await client.get(HomeCity)
-    return f"""{weather.temperature} Fahrenheit and {str(weather.kind)}.
-    (extraneous data, only tell if user wanted any of the following:) description: {str(weather.description)}, feels like: {str(weather.feels_like)} F,
-    humidity: {weather.humidity}, precipitation: {weather.precipitation} inches,
-    pressure: {weather.pressure} inches, visibility: {weather.visibility} miles,
-    ultraviolet: {str(weather.ultraviolet)},
-    wind direction: {str(weather.wind_direction)}, wind speed: {weather.wind_speed} mph
-    """
+    forecasts = {}
+    # str(datetime.date.today().strftime("%a"))
+    for day in weather:
+        for hour in day:
+            huor = hour.date.strftime("%H")
+            filtered_chances = {
+                attr: getattr(hour, attr)
+                for attr in dir(hour)
+                if attr.startswith("chances_of_") and getattr(hour, attr) > 0
+            }
+            tha_key = huor if huor != datetime.date.today().strftime("%H") else "Now"
+            forecasts[tha_key] = f"{hour.temperature} degrees F (feels like {hour.feels_like} degrees), chances of weather are: {filtered_chances}. Auto-generated description is \"{hour.description}\"."
+    return str(forecasts)
 
 #Holy Christ
 import json
