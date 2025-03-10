@@ -95,6 +95,8 @@ class MyTUI(App):
         log_widget = self.query_one("#debug", Log)
         log_widget.write(message.strip()+"\n")  # Strip extra newlines
         self.file.write(f"STDOUT -> {message}")
+        self.file.flush()
+
         #asyncio.run(self.refresh())
 
     def flush(self):
@@ -110,7 +112,8 @@ class MyTUI(App):
         log_widget.write(message + "\n")  # Append new line
         log_widget.scroll_end()  # Forces it to scroll down
         self.refresh()
-        print(self.file.write(f"{log_id} -> {message}\n"))
+        self.file.write(f"{log_id} -> {message}\n")
+        self.file.flush()
 
     log_text = log_message
     
