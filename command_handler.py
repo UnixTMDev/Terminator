@@ -289,9 +289,9 @@ def exec_file2(a):
     return str(runSwagReal(["bash","-c",a], stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL))
 
 
-args_format.update({"weather":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
+args_format.update({"current_weather":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
 import python_weather
-async def weather(args: str) -> str:
+async def current_weather(args: str) -> str:
     async with python_weather.Client(unit=python_weather.IMPERIAL) as client:
         # fetch a weather forecast from a city
         weather = await client.get(HomeCity)
@@ -316,7 +316,7 @@ async def forecast_daily(args: str) -> str:
         forecasts[weekday if weekday != datetime.date.today().strftime("%a") else "Today"] = f"High of {day.highest_temperature} and low of {day.lowest_temperature}, moon is {str(day.moon_phase)}."
     return str(forecasts)
 
-#args_format.update({"forecast_hourly":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
+args_format.update({"forecast_hourly":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
 import python_weather
 async def forecast_hourly(args: str) -> str:
     async with python_weather.Client(unit=python_weather.IMPERIAL) as client:

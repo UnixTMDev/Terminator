@@ -1,10 +1,1 @@
 #speech -> Terminator active...
-#debug -> speech start
-#debug -> speech end
-#userWords -> << "Terminator, give me the daily forecast."
-#commands -> ```plaintext
-forecast_daily;
-```
-Weather data should now be provided for today's forecast. If there are specific details you need later, just let me know!
-#results -> Action 2: {'Sun': 'High of 52 and low of 29, moon is Waxing Gibbous.', 'Mon': 'High of 42 and low of 25, moon is Waxing Gibbous.', 'Tue': 'High of 41 and low of 25, moon is Waxing Gibbous.'}
-#speech -> Tomorrow, expect a high of 52 and a low of 29 with the moon waxing gibbous. On Monday, it'll be cooler, reaching a high of 42 and dipping to 25, with the same moon phase. Tuesday continues this trend, slightly chillier at a high of 41 and a low of 25.
