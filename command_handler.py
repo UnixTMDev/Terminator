@@ -312,7 +312,8 @@ async def forecast_daily(args: str) -> str:
     forecasts = {}
     # str(datetime.date.today().strftime("%a"))
     for day in weather:
-        forecasts[day.date.strftime("%a")] = f"High of {day.highest_temperature} and low of {day.lowest_temperature}, moon is {str(day.moon_phase)}."
+        weekday = day.date.strftime("%a")
+        forecasts[weekday if weekday != datetime.date.today().strftime("%a") else "Today"] = f"High of {day.highest_temperature} and low of {day.lowest_temperature}, moon is {str(day.moon_phase)}."
     return str(forecasts)
 
 #args_format.update({"forecast_hourly":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
