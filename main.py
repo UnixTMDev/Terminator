@@ -67,6 +67,7 @@ class MyTUI(App):
         )
 
     runningReal = False
+    file = open("log.txt","w")
 
     def on_mount(self):
         self.runningReal = True
@@ -107,6 +108,7 @@ class MyTUI(App):
         log_widget.write(message + "\n")  # Append new line
         log_widget.scroll_end()  # Forces it to scroll down
         self.refresh()
+        file.write(f"{log_id} -> {message}")
 
     log_text = log_message
     

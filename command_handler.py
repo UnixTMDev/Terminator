@@ -246,7 +246,7 @@ from imports.pokemon import pokedex
 args_format.update({"random":"<lower and higher bound, both inclusive, separated by a colon>"})
 async def random(args):
     asdf = args.split(":")
-    return randint(int(asdf[0]),int(asdf[1]))
+    return str(randint(int(asdf[0]),int(asdf[1])))
 
 args_format.update({"wolfram":"<Wolfram Alpha query, usually unit conversions or other simple questions>"})
 async def wolfram(args):
