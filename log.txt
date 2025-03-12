@@ -1,15 +1,58 @@
 #speech -> Terminator active...
 #debug -> speech start
 #debug -> speech end
-#userWords -> << "Jarvis, turn on the lights."
-#commands -> `light;turn on`  
-`pause;`
+#userWords -> << "Jarvis, turn the lights on."
+#commands -> light;on  
+lights;on
 #results -> Action 1: K.
-Action 2: K.
-#speech -> The lights are now turned on. Let me know if there's anything else you need!
+Action 2: Invalid command, idiot.
+#speech -> The lights are now on. The second request didn't work because it wasn't a valid command.
 #debug -> speech start
 #debug -> speech end
-#userWords -> << "Jarvis, turn the light on."
-#commands -> exec_file;~/.config/lights/light-on
-#results -> Program started, return value unknown
-#speech -> Sure thing! Let's get that light turned on for you. 🌟
+#userWords -> << "Jarvis, turn the lights on."
+#commands -> `light;on`  
+`wait;`
+#results -> PRERUN: reRuŃ
+Action 1: K.
+STDOUT -> STDOUT -> 
+#commands -> DEAR WOLFRAM: To convert "turn the lights on" into a specific action for Jarvis (or any smart assistant), it typically involves sending a voice or text command that aligns with how the system is programmed to recognize and execute tasks. In this case, since you want Jarvis to turn on the lights, here’s what you need to do:
+
+1. **Command Recognition**: Ensure your smart device recognizes "Jarvis" as an activation word for starting commands.
+   
+2. **Specific Command**: Use a clear command such as:
+   - "Turn on the lights," or
+   - "Light up the room."
+
+3. **Device Connectivity**: Confirm that Jarvis is connected to your smart home system, specifically the lighting system.
+
+4. **Configuration Check**: Ensure any necessary configurations are set (e.g., linked accounts, correct device names).
+
+If you need to convert units related to energy consumption or brightness levels (like watts to lumens), here's a query for WolframAlpha:
+
+```
+Convert 60 watts to lumens
+```
+
+This will help you understand how much light is produced by the bulbs used in your setup.
+#results -> reRuŃ
+Action 1: K.
+UNIT CONVERSIONS DONE: To convert "turn the lights on" into a specific action for Jarvis (or any smart assistant), it typically involves sending a voice or text command that aligns with how the system is programmed to recognize and execute tasks. In this case, since you want Jarvis to turn on the lights, here’s what you need to do:
+
+1. **Command Recognition**: Ensure your smart device recognizes "Jarvis" as an activation word for starting commands.
+   
+2. **Specific Command**: Use a clear command such as:
+   - "Turn on the lights," or
+   - "Light up the room."
+
+3. **Device Connectivity**: Confirm that Jarvis is connected to your smart home system, specifically the lighting system.
+
+4. **Configuration Check**: Ensure any necessary configurations are set (e.g., linked accounts, correct device names).
+
+If you need to convert units related to energy consumption or brightness levels (like watts to lumens), here's a query for WolframAlpha:
+
+
+Convert 60 watts to lumens
+
+
+This will help you understand how much light is produced by the bulbs used in your setup. Error during search.
+#speech -> Got it! I turned on the lights for you. If you need anything else, like converting energy usage or adjusting settings, just let me know!

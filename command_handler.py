@@ -358,18 +358,21 @@ def light(args: str) -> str:
             return False
         return json.loads(res.text)
     desired = args.lstrip().rstrip()
-    if desired.lower() in ["on","yes","true","enabled","active","powered","resume","unpause"]:
-        set_device_state('on', TargetDevice)
-    if desired.lower() in ["off","no","false","disabled","inactive","unpowered","pause"]:
-        set_device_state('off', TargetDevice)
-    if desired.lower() in ["toggle","flip","switch","swap","invert","shift",""] or not desired:
-        state = get_device_state(TargetDevice).get("state","off")
-        if state == "on":
+    for x in ["on","yes","true","enabled","active","powered","resume","unpause"]:
+        if x in desired.lower():
+            set_device_state('on', TargetDevice)
+    for x in ["off","no","false","disabled","inactive","unpowered","pause"]:
+        if x in desired.lower():
             set_device_state('off', TargetDevice)
-        elif state == "off":
-            set_device_state('on', TargetDevice)
-        else:
-            set_device_state('on', TargetDevice)
+    for x in ["toggle","flip","switch","swap","invert","shift",""]:
+        if x in desired.lower() or not desired:
+            state = get_device_state(TargetDevice).get("state","off")
+            if state == "on":
+                set_device_state('off', TargetDevice)
+            elif state == "off":
+                set_device_state('on', TargetDevice)
+            else:
+                set_device_state('on', TargetDevice)
     return "K."
 
 from rapidfuzz import fuzz
