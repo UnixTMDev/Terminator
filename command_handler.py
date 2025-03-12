@@ -303,6 +303,9 @@ async def current_weather(args: str) -> str:
     wind direction: {str(weather.wind_direction)}, wind speed: {weather.wind_speed} mph
     """
 
+args_format.update({"weather":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
+weather = current_weather
+
 args_format.update({"forecast_daily":"<IMPERIAL RESULTS, ignores arguments, uses user's home city>"})
 import python_weather
 async def forecast_daily(args: str) -> str:
