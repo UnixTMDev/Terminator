@@ -2,6 +2,8 @@ from settings import *
 
 from imports.llm_prompts import *
 
+from imports.global_junk import *
+
 ##Imports used several times
 
 #What do you think it's for???
@@ -60,7 +62,7 @@ from random import randint
 
 args_format.update({"wait":"<no args, does all unit conversions needed>"})
 
-async def parse(command: str, first_time=True) -> str:
+async def parse(command: str, cmd_sockets: list) -> str:
     """Parses out and runs command passed in, and returns the response as a String to be read by TTS.
     Format goes: "command;arg1 arg2 arg3" """
     if len(command.strip().splitlines()) > 1:
@@ -99,10 +101,30 @@ async def parse(command: str, first_time=True) -> str:
         return "Error happened. Go take a look at the logs."
 
 args_format.update({"invalid":"<ignores arguments, use any>"})
-def invalid(*args, first_time=True) -> str:
+def invalid(*args) -> str:
     """Just complains. Returns a string for TTS."""
     response = "Invalid command, idiot."
     return response
+
+args_format.update({"relay":"<target device>:<remote Terminator command, follows \"command;args\" format>"})
+async def relay(cmd_sockets: list,args: str,*extra_args) -> str:
+    target = args[:args.index(":")]
+    c = args[args.index(":")+1:]
+    cmd = c[:c.index(";")]
+    arguments = c[c.index(";")+1:]
+    data = json.dumps({
+        "target_device": target,
+        "command": cmd,
+        "args": arguments
+    })
+    latest_responses[target] = ""
+    for ws in cmd_sockets:
+        await ws.send(data)
+
+    await response_events[target].wait()
+    response_events[target].clear()  # Reset the event for future waits
+
+    return latest_responses[target]
 
 args_format.update({"cancel":"<ignores arguments, use any>"})
 def cancel(*args) -> str:

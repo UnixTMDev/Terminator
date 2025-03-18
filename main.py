@@ -3,6 +3,7 @@
 # Allow to get results before writing extra commands.
 ##TODO##
 
+from imports.global_junk import *
 from RealtimeSTT import AudioToTextRecorder
 from settings import *
 
@@ -123,8 +124,9 @@ from path_stuff import get_executables_in_path as path_execs
 import command_handler as cmd_parser
 not_ideal_misfires = ["suicide","cancel","invalid","exit_program","pause_listening","close_program","stop_program","open_url"]
 for x in UnwantedMisfires: not_ideal_misfires.append(x)
+cmd_sockets = []
 
-async def callbacklol(command, remote=False):
+async def callbacklol(command, device="PC", user_name=UsersName):
     global tts
     await ui.log_text("#userWords",f"{'<' if not any(w in command.lower() for w in WakeWords.split(',')) else '<<'} \"{command}\"")
     if not any(w in command.lower() for w in WakeWords.split(',')) and remote == False:
@@ -144,6 +146,7 @@ async def callbacklol(command, remote=False):
         {'role':'user','content':"You CAN do math and launch programs and crap. Also you have control of my bedroom light. I only listen to music on YouTube. You can launch most games on Steam. Minecraft is the main exception to that. Minecraft gets its own command. It's NEVER used as an argument. Got that? Good. AND, You CAN play YouTube videos."},
         {'role':'system','content':f"If the user says 'this' or 'that', they could be referring to their clipboard contents, which is currently \"{pyperclip.paste()}\"."},
         {'role':"system","content":f"The executables installed are (shown as Python list): {str(path_execs())}"},
+        {'role':'user','content':f"My name is {UsersName}, and this command is being run from my {device}."},
         {'role':'user','content':command}
     ]
     llm_response = ollama.chat(model=LLMModel, messages=llm_messages)
@@ -164,7 +167,7 @@ async def callbacklol(command, remote=False):
             #print("Third strike, you're out.")
     await ui.log_text("#commands",cmd)
     if cmd.split(";")[0].strip() not in ["invalid","cancel"]:
-        result = await cmd_parser.parse(cmd.replace("`",""))
+        result = await cmd_parser.parse(cmd.replace("`",""), cmd_sockets=cmd_sockets)
         if "reRuŃ" in result[:8]:
             await ui.log_text("#results",f"PRERUN: {result}")
             llm_messages2 = [
@@ -233,7 +236,9 @@ async def terminator_loop():
 
 import websockets
 
-async def handler(websocket):
+
+
+async def api_handler(websocket):
     while True:
         try:
             message = await websocket.recv()
@@ -242,14 +247,33 @@ async def handler(websocket):
         except websockets.exceptions.ConnectionClosed:
             break
 
+async def cmd_handler(websocket):
+    cmd_sockets.append(websocket)
+    while True:
+        try:
+            res = await websocket.recv()
+            target = response.get("device","unknown")
+            latest_responses[target] = response.get("result", "ERROR")
+            if target in response_events:
+                response_events[target].set()  # Notify waiting coroutines
+            response = json.loads(res)
+            #await websocket.send(res)
+        except websockets.exceptions.ConnectionClosed:
+            break
 
 async def api_thread():
-    async with websockets.serve(handler, "0.0.0.0", 5700):
+    async with websockets.serve(api_handler, "0.0.0.0", 5700):
+        await asyncio.Future()  # run forever
+
+async def cmd_api_thread():
+    async with websockets.serve(cmd_handler, "0.0.0.0", 5701):
         await asyncio.Future()  # run forever
 
 therminator = Thread(target=lambda: asyncio.run(terminator_loop()))
 therminator.start()
 therminator_api = Thread(target=lambda: asyncio.run(api_thread()))
 therminator_api.start()
+therminator_cmd_api = Thread(target=lambda: asyncio.run(cmd_api_thread()))
+therminator_cmd_api.start()
 time.sleep(5)
 ui.run()
