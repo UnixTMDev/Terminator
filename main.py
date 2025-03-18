@@ -129,7 +129,7 @@ cmd_sockets = []
 async def callbacklol(command, device="PC", user_name=UsersName):
     global tts
     await ui.log_text("#userWords",f"{'<' if not any(w in command.lower() for w in WakeWords.split(',')) else '<<'} \"{command}\"")
-    if not any(w in command.lower() for w in WakeWords.split(',')) and remote == False:
+    if not any(w in command.lower() for w in WakeWords.split(',')) and device != "PC":
         return
     if any(w in command.lower() for w in WakeWords.split(',')):
         tts.stop()   
@@ -143,7 +143,7 @@ async def callbacklol(command, device="PC", user_name=UsersName):
         {'role': 'tool','content':str(get_library(Gamer))},
         {'role': 'system','content':f"The user wants you to know about them: \"{UserInfo}\""},
         {'role': 'system', 'content':f"Reminder, the valid commands are (this time without the arguments): {str(cmd_parser.args_format.keys())}. These are the only commands you may use."},
-        {'role':'user','content':"You CAN do math and launch programs and crap. Also you have control of my bedroom light. I only listen to music on YouTube. You can launch most games on Steam. Minecraft is the main exception to that. Minecraft gets its own command. It's NEVER used as an argument. Got that? Good. AND, You CAN play YouTube videos."},
+        {'role':'user','content':"You CAN do math and launch programs and crap. Also you have control of my bedroom light. I only listen to music on YouTube. You can launch most games on Steam. Minecraft is the main exception to that. Minecraft gets its own command. It's NEVER used as an argument. Got that? Good. AND, You CAN play YouTube videos, you CAN directly control my phone."},
         {'role':'system','content':f"If the user says 'this' or 'that', they could be referring to their clipboard contents, which is currently \"{pyperclip.paste()}\"."},
         {'role':"system","content":f"The executables installed are (shown as Python list): {str(path_execs())}"},
         {'role':'user','content':f"My name is {UsersName}, and this command is being run from my {device}."},
@@ -239,6 +239,7 @@ import websockets
 
 
 async def api_handler(websocket):
+    print("new chat client connected")
     while True:
         try:
             message = await websocket.recv()
@@ -248,6 +249,7 @@ async def api_handler(websocket):
             break
 
 async def cmd_handler(websocket):
+    print("new command client connected")
     cmd_sockets.append(websocket)
     while True:
         try:
