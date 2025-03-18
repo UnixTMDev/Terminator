@@ -129,7 +129,7 @@ cmd_sockets = []
 async def callbacklol(command, device="PC", user_name=UsersName):
     global tts
     await ui.log_text("#userWords",f"{'<' if not any(w in command.lower() for w in WakeWords.split(',')) else '<<'} \"{command}\"")
-    if not any(w in command.lower() for w in WakeWords.split(',')) and device != "PC":
+    if not any(w in command.lower() for w in WakeWords.split(',')) and device == "PC":
         return
     if any(w in command.lower() for w in WakeWords.split(',')):
         tts.stop()   
@@ -149,19 +149,19 @@ async def callbacklol(command, device="PC", user_name=UsersName):
         {'role':'user','content':f"My name is {UsersName}, and this command is being run from my {device}."},
         {'role':'user','content':command}
     ]
-    llm_response = ollama.chat(model=LLMModel, messages=llm_messages)
+    llm_response = ollama.chat(model=LLMModel, messages=llm_messages, options={"num_ctx":4096})
     cmd = llm_response['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
     #print("LLM says: ",cmd)
     
     if cmd.split(";")[0] in not_ideal_misfires:
         #print("Double-checking, too many false negatives nowadays.")
-        llm_response = ollama.chat(model=LLMModel, messages=llm_messages)
+        llm_response = ollama.chat(model=LLMModel, messages=llm_messages, options={"num_ctx":4096})
         cmd = llm_response['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
         #print("LLM says: ",cmd)
         #print("Must be the right command THIS time, surely.")
         if cmd.split(";")[0] in not_ideal_misfires:
             #print("TRIPLE-checking, it wasn't.")
-            llm_response = ollama.chat(model=LLMModel, messages=llm_messages)
+            llm_response = ollama.chat(model=LLMModel, messages=llm_messages, options={"num_ctx":4096})
             cmd = llm_response['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
             #print("LLM says: ",cmd)
             #print("Third strike, you're out.")
@@ -202,7 +202,7 @@ async def callbacklol(command, device="PC", user_name=UsersName):
             {'role':'user','content':command},
             {'role':'tool', 'content':result}
         ]
-        llm_response2 = ollama.chat(model=LLMModel, messages=llm_messages)
+        llm_response2 = ollama.chat(model=ResponseModel, messages=llm_messages, options={"num_ctx":4096})
         message = llm_response2['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
     else:
         message = result
