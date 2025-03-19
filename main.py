@@ -75,7 +75,7 @@ class MyTUI(App):
         self.screen.styles.background = Color.parse("#34027a")
         # Redirect stdout and stderr
         #f = open("log.txt","w")
-        self.file = open("log.txt","w")
+        self.file = open("junk/log.txt","w")
         sys.stdout = self
         sys.stderr = self
 
