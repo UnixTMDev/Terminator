@@ -257,12 +257,15 @@ async def cmd_handler(websocket):
     while True:
         try:
             res = await websocket.recv()
+            response = json.loads(res)
             target = response.get("device","unknown")
             latest_responses[target] = response.get("result", "ERROR")
-            if target in response_events:
-                response_events[target].set()  # Notify waiting coroutines
-            response = json.loads(res)
-            #await websocket.send(res)
+            #if target in response_events:
+                #print(f"Scheduling event set for {target}")
+                #print(f"cmd_handler() event object for {target}: {response_events[target]}")
+                #print(f"cmd_handler() running in loop: {asyncio.get_running_loop()}")
+                #await response_events[target].put(response.get("result", "ERROR"))  # Put result in queue
+
         except websockets.exceptions.ConnectionClosed:
             break
 
@@ -282,3 +285,4 @@ therminator_cmd_api = Thread(target=lambda: asyncio.run(cmd_api_thread()))
 therminator_cmd_api.start()
 time.sleep(5)
 ui.run()
+# {"device":"phone","result":"Test response. Success :)"}

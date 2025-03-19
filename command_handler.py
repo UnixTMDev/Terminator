@@ -81,7 +81,7 @@ async def parse(command: str) -> str:
     test = inst.split()
     if len(test) > 1:
         inst = test[-1]
-    args = command.removeprefix(command.split(";")[0].rstrip().lstrip()+";").replace(";"," ")
+    args = command.removeprefix(command.split(";")[0].rstrip().lstrip()+";")
     if args == command: args = ""
     if (inst == "invalid" or inst == "cancel") and args.__contains__(";"):
         command = command[len(inst):]
@@ -109,23 +109,26 @@ def invalid(*args) -> str:
 args_format.update({"relay":"<target device>:<remote Terminator command, follows \"command;args\" format>"})
 async def relay(args: str,*extra_args) -> str:
     global cmd_sockets
-    target = args[:args.index(":")]
+    target = args[:args.index(":")].strip()
     c = args[args.index(":")+1:]
-    cmd = c[:c.index(";")]
-    arguments = c[c.index(";")+1:]
+    cmd = c[:c.index(";")].strip()
+    arguments = c[c.index(";")+1:].strip()
     data = json.dumps({
-        "target_device": target,
+        "device": target,
         "command": cmd,
         "args": arguments
     })
+
     latest_responses[target] = ""
     for ws in cmd_sockets:
         await ws.send(data)
 
-    await response_events[target].wait()
-    response_events[target].clear()  # Reset the event for future waits
+    await wait_for_condition(lambda: latest_responses[target] != "")
+    result = latest_responses[target]
+    print(f"response from {target}!")
+    print(result)
+    return result
 
-    return latest_responses[target]
 
 args_format.update({"cancel":"<ignores arguments, use any>"})
 def cancel(*args) -> str:
