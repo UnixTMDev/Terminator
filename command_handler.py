@@ -62,7 +62,7 @@ from random import randint
 
 args_format.update({"wait":"<no args, does all unit conversions needed>"})
 
-async def parse(command: str, cmd_sockets: list) -> str:
+async def parse(command: str) -> str:
     """Parses out and runs command passed in, and returns the response as a String to be read by TTS.
     Format goes: "command;arg1 arg2 arg3" """
     if len(command.strip().splitlines()) > 1:
@@ -107,7 +107,8 @@ def invalid(*args) -> str:
     return response
 
 args_format.update({"relay":"<target device>:<remote Terminator command, follows \"command;args\" format>"})
-async def relay(cmd_sockets: list,args: str,*extra_args) -> str:
+async def relay(args: str,*extra_args) -> str:
+    global cmd_sockets
     target = args[:args.index(":")]
     c = args[args.index(":")+1:]
     cmd = c[:c.index(";")]
@@ -197,8 +198,8 @@ exit = suicide
 args_format.update({"time":"<ignores arguments, use any>"})
 def time(*args) -> str:
     now = datetime.datetime.now()
-    strftime = now.strftime("%H:%M")
-    return f"It's {strftime}. (24h)"
+    strftime = now.strftime("%H:%M (%I:%M %p)")
+    return f"It's {strftime}."
 
 
 # args_format.update({"pause_listening":"<amount of seconds>"})

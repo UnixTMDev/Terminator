@@ -124,9 +124,10 @@ from path_stuff import get_executables_in_path as path_execs
 import command_handler as cmd_parser
 not_ideal_misfires = ["suicide","cancel","invalid","exit_program","pause_listening","close_program","stop_program","open_url"]
 for x in UnwantedMisfires: not_ideal_misfires.append(x)
-cmd_sockets = []
 
-async def callbacklol(command, device="PC", user_name=UsersName):
+
+
+async def callbacklol(command, device="PC"):
     global tts
     await ui.log_text("#userWords",f"{'<' if not any(w in command.lower() for w in WakeWords.split(',')) else '<<'} \"{command}\"")
     if not any(w in command.lower() for w in WakeWords.split(',')) and device == "PC":
@@ -141,33 +142,34 @@ async def callbacklol(command, device="PC", user_name=UsersName):
         {'role': 'system','content':llm_prompts.get_overall_command},
         {'role': 'assistant','content':command_list},
         {'role': 'tool','content':str(get_library(Gamer))},
-        {'role': 'system','content':f"The user wants you to know about them: \"{UserInfo}\""},
+        {'role': 'system','content':f"The user ({UsersName}) wants you to know about them: \"{UserInfo}\". Also, they are talking from their {device}."},
         {'role': 'system', 'content':f"Reminder, the valid commands are (this time without the arguments): {str(cmd_parser.args_format.keys())}. These are the only commands you may use."},
-        {'role':'user','content':"You CAN do math and launch programs and crap. Also you have control of my bedroom light. I only listen to music on YouTube. You can launch most games on Steam. Minecraft is the main exception to that. Minecraft gets its own command. It's NEVER used as an argument. Got that? Good. AND, You CAN play YouTube videos, you CAN directly control my phone."},
+        #{'role':'user','content':"You CAN do math and launch programs and crap. Also you have control of my bedroom light. I only listen to music on YouTube. You can launch most games on Steam. Minecraft is the main exception to that. Minecraft gets its own command. It's NEVER used as an argument. Got that? Good. AND, You CAN play YouTube videos, you CAN directly control my phone."},
         {'role':'system','content':f"If the user says 'this' or 'that', they could be referring to their clipboard contents, which is currently \"{pyperclip.paste()}\"."},
         {'role':"system","content":f"The executables installed are (shown as Python list): {str(path_execs())}"},
-        {'role':'user','content':f"My name is {UsersName}, and this command is being run from my {device}."},
         {'role':'user','content':command}
     ]
-    llm_response = ollama.chat(model=LLMModel, messages=llm_messages, options={"num_ctx":4096})
+    # NOTE: For whatever reason, adding a message before the one @:150 disables the prompt.
+    # I don't even know, man.
+    llm_response = ollama.chat(model=LLMModel, messages=llm_messages)
     cmd = llm_response['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
     #print("LLM says: ",cmd)
     
     if cmd.split(";")[0] in not_ideal_misfires:
         #print("Double-checking, too many false negatives nowadays.")
-        llm_response = ollama.chat(model=LLMModel, messages=llm_messages, options={"num_ctx":4096})
+        llm_response = ollama.chat(model=LLMModel, messages=llm_messages)
         cmd = llm_response['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
         #print("LLM says: ",cmd)
         #print("Must be the right command THIS time, surely.")
         if cmd.split(";")[0] in not_ideal_misfires:
             #print("TRIPLE-checking, it wasn't.")
-            llm_response = ollama.chat(model=LLMModel, messages=llm_messages, options={"num_ctx":4096})
+            llm_response = ollama.chat(model=LLMModel, messages=llm_messages)
             cmd = llm_response['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
             #print("LLM says: ",cmd)
             #print("Third strike, you're out.")
     await ui.log_text("#commands",cmd)
     if cmd.split(";")[0].strip() not in ["invalid","cancel"]:
-        result = await cmd_parser.parse(cmd.replace("`",""), cmd_sockets=cmd_sockets)
+        result = await cmd_parser.parse(cmd.replace("`",""))
         if "reRuŃ" in result[:8]:
             await ui.log_text("#results",f"PRERUN: {result}")
             llm_messages2 = [
@@ -199,10 +201,11 @@ async def callbacklol(command, device="PC", user_name=UsersName):
     if HumanResponses and WordsReady and cmd.split(";")[0] != "pokedex" and cmd.split(";")[0] != "wikipedia":
         llm_messages = [
             {'role':'system', 'content':llm_prompts.human_response_prompt},
+            {'role':'assistant','content':cmd},
             {'role':'user','content':command},
             {'role':'tool', 'content':result}
         ]
-        llm_response2 = ollama.chat(model=ResponseModel, messages=llm_messages, options={"num_ctx":4096})
+        llm_response2 = ollama.chat(model=ResponseModel, messages=llm_messages)
         message = llm_response2['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
     else:
         message = result

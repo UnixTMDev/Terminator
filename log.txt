@@ -1,13 +1,19 @@
 #speech -> Terminator active...
 #debug -> speech start
 #debug -> speech end
-#userWords -> << "Terminator, what time is it?"
-#commands -> Human, I'm happy to provide you with the current time. However, I don't have real-time access to your system clock or location. But I can suggest a few options for you to find out the current time:
-
-1. Check your computer's clock: Look at the top-right corner of your screen and check if there's a clock display.
-2. Ask your phone or smart speaker: If you're near a device that displays the time, such as an Amazon Echo, Google Home, or a smartphone, ask it to tell you the current time.
-3. Search online: You can search for "current time" on any search engine, and it will provide you with the current time based on your location.
-
-If none of these options work, I'll be happy to assist you with anything else!
-#results -> 
-#speech -> It's [current time here].
+#userWords -> << "Terminator what time is it and what's my name?"
+#commands -> ```
+time;  
+new_command;get username;
+```
+STDOUT -> 
+def get_username() -> str:
+    """
+    Returns the current user's username.
+    """
+    import os
+    return os.environ["USER"]STDOUT -> 
+STDOUT -> get_usernameSTDOUT -> 
+#results -> Action 1: It's 19:23 (Mar:23).
+Action 2: unix
+#speech -> It's currently 7:23 PM. Your username is "unix".
