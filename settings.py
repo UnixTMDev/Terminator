@@ -40,3 +40,6 @@ SpeechRateDesired = 150
 #An LLM proccesses the user input, select it here.
 #ollama model names, see at https://ollama.com/library
 LLMModel = "phi4"
+ResponseModel = "phi4"
+
+from secrets_real import *

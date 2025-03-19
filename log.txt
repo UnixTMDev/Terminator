@@ -1,8 +1,5 @@
+STDOUT -> new command client connectedSTDOUT -> 
 #speech -> Terminator active...
 #debug -> speech start
 #debug -> speech end
-#userWords -> << "Terminator, turn the lights on."
-#commands -> `light;on`  
-"Okay."
-#results -> Action 1: Okay.
-#speech -> Lights are on!
+

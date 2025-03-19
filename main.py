@@ -3,6 +3,7 @@
 # Allow to get results before writing extra commands.
 ##TODO##
 
+from imports.global_junk import *
 from RealtimeSTT import AudioToTextRecorder
 from settings import *
 
@@ -124,10 +125,12 @@ import command_handler as cmd_parser
 not_ideal_misfires = ["suicide","cancel","invalid","exit_program","pause_listening","close_program","stop_program","open_url"]
 for x in UnwantedMisfires: not_ideal_misfires.append(x)
 
-async def callbacklol(command, remote=False):
+
+
+async def callbacklol(command, device="PC"):
     global tts
     await ui.log_text("#userWords",f"{'<' if not any(w in command.lower() for w in WakeWords.split(',')) else '<<'} \"{command}\"")
-    if not any(w in command.lower() for w in WakeWords.split(',')) and remote == False:
+    if not any(w in command.lower() for w in WakeWords.split(',')) and device == "PC":
         return
     if any(w in command.lower() for w in WakeWords.split(',')):
         tts.stop()   
@@ -139,13 +142,15 @@ async def callbacklol(command, remote=False):
         {'role': 'system','content':llm_prompts.get_overall_command},
         {'role': 'assistant','content':command_list},
         {'role': 'tool','content':str(get_library(Gamer))},
-        {'role': 'system','content':f"The user wants you to know about them: \"{UserInfo}\""},
+        {'role': 'system','content':f"The user ({UsersName}) wants you to know about them: \"{UserInfo}\". Also, they are talking from their {device}."},
         {'role': 'system', 'content':f"Reminder, the valid commands are (this time without the arguments): {str(cmd_parser.args_format.keys())}. These are the only commands you may use."},
-        {'role':'user','content':"You CAN do math and launch programs and crap. Also you have control of my bedroom light. I only listen to music on YouTube. You can launch most games on Steam. Minecraft is the main exception to that. Minecraft gets its own command. It's NEVER used as an argument. Got that? Good. AND, You CAN play YouTube videos."},
+        #{'role':'user','content':"You CAN do math and launch programs and crap. Also you have control of my bedroom light. I only listen to music on YouTube. You can launch most games on Steam. Minecraft is the main exception to that. Minecraft gets its own command. It's NEVER used as an argument. Got that? Good. AND, You CAN play YouTube videos, you CAN directly control my phone."},
         {'role':'system','content':f"If the user says 'this' or 'that', they could be referring to their clipboard contents, which is currently \"{pyperclip.paste()}\"."},
         {'role':"system","content":f"The executables installed are (shown as Python list): {str(path_execs())}"},
         {'role':'user','content':command}
     ]
+    # NOTE: For whatever reason, adding a message before the one @:150 disables the prompt.
+    # I don't even know, man.
     llm_response = ollama.chat(model=LLMModel, messages=llm_messages)
     cmd = llm_response['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
     #print("LLM says: ",cmd)
@@ -196,10 +201,11 @@ async def callbacklol(command, remote=False):
     if HumanResponses and WordsReady and cmd.split(";")[0] != "pokedex" and cmd.split(";")[0] != "wikipedia":
         llm_messages = [
             {'role':'system', 'content':llm_prompts.human_response_prompt},
+            {'role':'assistant','content':cmd},
             {'role':'user','content':command},
             {'role':'tool', 'content':result}
         ]
-        llm_response2 = ollama.chat(model=LLMModel, messages=llm_messages)
+        llm_response2 = ollama.chat(model=ResponseModel, messages=llm_messages)
         message = llm_response2['message']['content'].removeprefix("dict_keys(['").removesuffix("'])")
     else:
         message = result
@@ -233,7 +239,10 @@ async def terminator_loop():
 
 import websockets
 
-async def handler(websocket):
+
+
+async def api_handler(websocket):
+    print("new chat client connected")
     while True:
         try:
             message = await websocket.recv()
@@ -242,14 +251,38 @@ async def handler(websocket):
         except websockets.exceptions.ConnectionClosed:
             break
 
+async def cmd_handler(websocket):
+    print("new command client connected")
+    cmd_sockets.append(websocket)
+    while True:
+        try:
+            res = await websocket.recv()
+            response = json.loads(res)
+            target = response.get("device","unknown")
+            latest_responses[target] = response.get("result", "ERROR")
+            #if target in response_events:
+                #print(f"Scheduling event set for {target}")
+                #print(f"cmd_handler() event object for {target}: {response_events[target]}")
+                #print(f"cmd_handler() running in loop: {asyncio.get_running_loop()}")
+                #await response_events[target].put(response.get("result", "ERROR"))  # Put result in queue
+
+        except websockets.exceptions.ConnectionClosed:
+            break
 
 async def api_thread():
-    async with websockets.serve(handler, "0.0.0.0", 5700):
+    async with websockets.serve(api_handler, "0.0.0.0", 5700):
+        await asyncio.Future()  # run forever
+
+async def cmd_api_thread():
+    async with websockets.serve(cmd_handler, "0.0.0.0", 5701):
         await asyncio.Future()  # run forever
 
 therminator = Thread(target=lambda: asyncio.run(terminator_loop()))
 therminator.start()
 therminator_api = Thread(target=lambda: asyncio.run(api_thread()))
 therminator_api.start()
+therminator_cmd_api = Thread(target=lambda: asyncio.run(cmd_api_thread()))
+therminator_cmd_api.start()
 time.sleep(5)
 ui.run()
+# {"device":"phone","result":"Test response. Success :)"}

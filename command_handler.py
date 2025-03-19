@@ -2,6 +2,8 @@ from settings import *
 
 from imports.llm_prompts import *
 
+from imports.global_junk import *
+
 ##Imports used several times
 
 #What do you think it's for???
@@ -60,7 +62,7 @@ from random import randint
 
 args_format.update({"wait":"<no args, does all unit conversions needed>"})
 
-async def parse(command: str, first_time=True) -> str:
+async def parse(command: str) -> str:
     """Parses out and runs command passed in, and returns the response as a String to be read by TTS.
     Format goes: "command;arg1 arg2 arg3" """
     if len(command.strip().splitlines()) > 1:
@@ -79,7 +81,7 @@ async def parse(command: str, first_time=True) -> str:
     test = inst.split()
     if len(test) > 1:
         inst = test[-1]
-    args = command.removeprefix(command.split(";")[0].rstrip().lstrip()+";").replace(";"," ")
+    args = command.removeprefix(command.split(";")[0].rstrip().lstrip()+";")
     if args == command: args = ""
     if (inst == "invalid" or inst == "cancel") and args.__contains__(";"):
         command = command[len(inst):]
@@ -99,10 +101,34 @@ async def parse(command: str, first_time=True) -> str:
         return "Error happened. Go take a look at the logs."
 
 args_format.update({"invalid":"<ignores arguments, use any>"})
-def invalid(*args, first_time=True) -> str:
+def invalid(*args) -> str:
     """Just complains. Returns a string for TTS."""
     response = "Invalid command, idiot."
     return response
+
+args_format.update({"relay":"<target device>:<remote Terminator command, follows \"command;args\" format>"})
+async def relay(args: str,*extra_args) -> str:
+    global cmd_sockets
+    target = args[:args.index(":")].strip()
+    c = args[args.index(":")+1:]
+    cmd = c[:c.index(";")].strip()
+    arguments = c[c.index(";")+1:].strip()
+    data = json.dumps({
+        "device": target,
+        "command": cmd,
+        "args": arguments
+    })
+
+    latest_responses[target] = ""
+    for ws in cmd_sockets:
+        await ws.send(data)
+
+    await wait_for_condition(lambda: latest_responses[target] != "")
+    result = latest_responses[target]
+    print(f"response from {target}!")
+    print(result)
+    return result
+
 
 args_format.update({"cancel":"<ignores arguments, use any>"})
 def cancel(*args) -> str:
@@ -175,8 +201,8 @@ exit = suicide
 args_format.update({"time":"<ignores arguments, use any>"})
 def time(*args) -> str:
     now = datetime.datetime.now()
-    strftime = now.strftime("%H:%M")
-    return f"It's {strftime}. (24h)"
+    strftime = now.strftime("%H:%M (%I:%M %p)")
+    return f"It's {strftime}."
 
 
 # args_format.update({"pause_listening":"<amount of seconds>"})
