@@ -1,5 +1,0 @@
-STDOUT -> new command client connectedSTDOUT -> 
-#speech -> Terminator active...
-#debug -> speech start
-#debug -> speech end
-
