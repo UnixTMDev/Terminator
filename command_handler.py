@@ -390,19 +390,24 @@ def light(args: str) -> str:
     for x in ["on","yes","true","enabled","active","powered","resume","unpause"]:
         if x in desired.lower():
             set_device_state('on', TargetDevice)
+            return "Okay."
     for x in ["off","no","false","disabled","inactive","unpowered","pause"]:
         if x in desired.lower():
             set_device_state('off', TargetDevice)
+            return "Okay."
     for x in ["toggle","flip","switch","swap","invert","shift",""]:
         if x in desired.lower() or not desired:
             state = get_device_state(TargetDevice).get("state","off")
             if state == "on":
                 set_device_state('off', TargetDevice)
+                return "Okay."
             elif state == "off":
                 set_device_state('on', TargetDevice)
+                return "Okay."
             else:
                 set_device_state('on', TargetDevice)
-    return "K."
+                return "Okay."
+    return "No valid states given. I dunno man, tell the user you screwed up."
 
 from rapidfuzz import fuzz
 import os

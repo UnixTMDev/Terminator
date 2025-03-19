@@ -2,31 +2,4 @@ STDOUT -> new command client connectedSTDOUT ->
 #speech -> Terminator active...
 #debug -> speech start
 #debug -> speech end
-#userWords -> << "Terminator, what time is it?"
-#commands -> `time;`
-**Result:** [Displays the current system time.]
-#results -> Action 1: It's 20:04 (08:04 PM).
-#speech -> It's 8:04 PM. What else can I help you with?
-#debug -> speech start
-#debug -> speech end
-#userWords -> << "Terminator, tell me the time and the weather."
-#commands -> ```
-time;
-weather;
-```
-#results -> Action 1: It's 20:04 (08:04 PM).
-Action 2: 40 Fahrenheit and Sunny.
-    (extraneous data, only tell if user wanted any of the following:) description: Clear, feels like: 37 F,
-    humidity: 55, precipitation: 0.0 inches,
-    pressure: 30.0 inches, visibility: 9 miles,
-    ultraviolet: Low,
-    wind direction: South, wind speed: 4 mph
-#speech -> It's currently 8:04 PM and it's sunny with a temperature of 40°F.
-#debug -> speech start
-#debug -> speech end
-#userWords -> << "Terminator, open Firefox on my phone."
-#commands -> `relay;phone:open_app;Firefox`
-STDOUT -> response from phone!STDOUT -> 
-STDOUT -> Test response. Success :)STDOUT -> 
-#results -> Test response. Success :)
-#speech -> You asked me to open Firefox on your phone, right? I got that part done! If there's anything else you need help with, just let me know.
+
