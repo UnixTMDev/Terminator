@@ -245,8 +245,11 @@ async def api_handler(websocket):
     print("new chat client connected")
     while True:
         try:
-            message = await websocket.recv()
-            res = await callbacklol(message, remote=True)
+            data = await websocket.recv()
+            data = json.loads(data)
+            msg = data.get("msg")
+            device = data.get("device", "<UNKNOWN DEVICE>")
+            res = await callbacklol(msg, device=device)
             await websocket.send(res)
         except websockets.exceptions.ConnectionClosed:
             break
@@ -267,6 +270,7 @@ async def cmd_handler(websocket):
                 #await response_events[target].put(response.get("result", "ERROR"))  # Put result in queue
 
         except websockets.exceptions.ConnectionClosed:
+            cmd_sockets.remove(websocket)
             break
 
 async def api_thread():
