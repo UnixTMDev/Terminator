@@ -9,3 +9,5 @@ pyautogui
 python-steam-api
 pokebase
 wolframalpha
+duckduckgo-search
+googlesearch-python

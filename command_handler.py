@@ -43,6 +43,13 @@ def say(swag):
 
 #Code time
 
+def get_firefox_path() -> str:
+    path = shutil.which("firefox")
+    if path:
+        return path
+    else:
+        raise FileNotFoundError("bro... firefox ain't even installed 💀")
+
 def internet_connected(test_domain="https://unixtm.dev") -> bool:
     try:
         response = requests.get(test_domain, timeout=5)
@@ -246,7 +253,7 @@ def wikipedia(args: str) -> str:
 
 args_format.update({"google_search_in_browser":"<user's search query>"})
 def google_search_in_browser(args: str) -> str:
-    firefox = webbrowser.Mozilla("/home/unix/.nix-profile/bin/firefox")
+    firefox = webbrowser.Mozilla(get_firefox_path())
     query = args.lstrip().rstrip().replace(" ","+")
     ##print(query,"/args:",args)
     new_url = "https://www.google.com/search?q="+query
@@ -287,7 +294,7 @@ from youtube_search import YoutubeSearch
 def youtube(args: str) -> str:
     if args.lower() == "youtube": return "Not gonna search YouTube on YouTube. Isn't gonna work."
     results = YoutubeSearch(args, max_results=10).to_dict()
-    firefox = webbrowser.Mozilla("/home/unix/.nix-profile/bin/firefox")
+    firefox = webbrowser.Mozilla(get_firefox_path())
     firefox.open(f"https://youtube.com/watch?v={results[0].get('id')}", autoraise=False)
     #return f"Playing '{results[0].get('title')}' by {results[0].get('channel')}"
     return "Playing first video found."
@@ -362,8 +369,12 @@ async def forecast_hourly(args: str) -> str:
                 if attr.startswith("chances_of_") and getattr(hour, attr) > 0
             }
             tha_key = huor if huor != datetime.date.today().strftime("%H") else "Now"
-            forecasts[tha_key] = f"{hour.temperature} degrees F (feels like {hour.feels_like} degrees), chances of weather are: {filtered_chances}. Auto-generated description is \"{hour.description}\"."
+            if int(huor) >= int(datetime.date.today().strftime("%H")):
+                forecasts[tha_key] = f"{hour.temperature} degrees F (feels like {hour.feels_like} degrees), chances of weather are: {filtered_chances}. Auto-generated description is \"{hour.description}\"."
     return str(forecasts)
+
+args_format.update({"google_search_info":"<query>"})
+from imports.web_searches import smart_search as google_search_info
 
 #Holy Christ
 import json
