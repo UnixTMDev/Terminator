@@ -374,7 +374,9 @@ async def forecast_hourly(args: str) -> str:
     return str(forecasts)
 
 args_format.update({"google_search_info":"<query>"})
+args_format.update({"google_search":"<query>"})
 from imports.web_searches import smart_search as google_search_info
+google_search = google_search_info
 
 #Holy Christ
 import json
