@@ -373,8 +373,8 @@ async def forecast_hourly(args: str) -> str:
                 forecasts[tha_key] = f"{hour.temperature} degrees F (feels like {hour.feels_like} degrees), chances of weather are: {filtered_chances}. Auto-generated description is \"{hour.description}\"."
     return str(forecasts)
 
-args_format.update({"google_search_info":"<query>"})
-args_format.update({"google_search":"<query>"})
+args_format.update({"google_search_info":"<query, returns list of urls OR results>"})
+args_format.update({"google_search":"<query, returns list of urls OR results>"})
 from imports.web_searches import smart_search as google_search_info
 google_search = google_search_info
 
