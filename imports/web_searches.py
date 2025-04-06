@@ -44,5 +44,5 @@ def smart_search(query):
     return json.dumps({"source": "Google", "result": google_result})
 
 
-
-print(smart_search(input("?> ")))
+if __name__ == "__main__":
+    print(smart_search(input("?> ")))
