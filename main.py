@@ -125,13 +125,25 @@ import command_handler as cmd_parser
 not_ideal_misfires = ["suicide","cancel","invalid","exit_program","pause_listening","close_program","stop_program","open_url"]
 for x in UnwantedMisfires: not_ideal_misfires.append(x)
 
+LAST_CMD = ""
 
+import re
+
+def normalize(s):
+    return re.sub(r'[^a-zA-Z0-9]', '', s).lower()
 
 async def callbacklol(command, device="PC"):
-    global tts
+    global tts, LAST_CMD
+
     await ui.log_text("#userWords",f"{'<' if not any(w in command.lower() for w in WakeWords.split(',')) else '<<'} \"{command}\"")
+
+    if LAST_CMD == normalize(command):
+        return ""
+    else:
+        LAST_CMD = normalize(command)
+
     if not any(w in command.lower() for w in WakeWords.split(',')) and device == "PC":
-        return
+        return ""
     if any(w in command.lower() for w in WakeWords.split(',')):
         tts.stop()   
 
@@ -249,6 +261,8 @@ async def api_handler(websocket):
             data = json.loads(data)
             msg = data.get("msg")
             device = data.get("device", "<UNKNOWN DEVICE>")
+            if device == "phone":
+                await asyncio.sleep(5)
             res = await callbacklol(msg, device=device)
             await websocket.send(res)
         except websockets.exceptions.ConnectionClosed:
