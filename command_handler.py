@@ -422,6 +422,19 @@ def light(args: str) -> str:
                 return "Okay."
     return "No valid states given. I dunno man, tell the user you screwed up."
 
+args_format.update({"minecraft_storage":"(store/pull):<amount>!<item id without namespace>"})
+def minecraft_storage(args: str) -> str:
+    method_type = args[:args.index(":")]
+    method = "store" if method_type == "store" else "give"
+
+    itemData = args[args.index(":")+1:]
+    item = itemData.split("!")[1]
+    amt = itemData.split("!")[0]
+    res = requests.get(f"http://10.0.0.90:5711/player/{method}/UnixTMDev/{item}/{amt}")
+    if res.status_code != 200:
+        return False
+    return res.text
+
 from rapidfuzz import fuzz
 import os
 def find_best_match(query, options):
