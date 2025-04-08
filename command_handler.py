@@ -12,6 +12,8 @@ import datetime
 #REST APIs and checking internet status
 import requests
 
+import shutil
+
 #Waiting n crap
 import time as clock
 
@@ -104,6 +106,7 @@ async def parse(command: str) -> str:
             return globals().get(inst,invalid)(args)
     except Exception as e:
         print(traceback.format_exc())
+        print(f"\"{inst}\" called with args: \"{args}\"")
 
         return "Error happened. Go take a look at the logs."
 
@@ -436,7 +439,16 @@ def minecraft_storage(args: str) -> str:
     clock.sleep(1.5)
     return res.text
 
+import multiprocessing
 from mcrcon import MCRcon
+
+# Function that will run in a separate process
+def send_rcon_command(command):
+    with MCRcon("localhost", "password") as mcr:
+        response = mcr.command(command)
+        print(f"RCON Response: {response}")
+    return response
+
 args_format.update({"minecraft_base":"(tp_user_home/get_players_in_base)"})
 def minecraft_base(args: str) -> str:
     action = args.strip()
@@ -446,14 +458,17 @@ def minecraft_base(args: str) -> str:
     if action in ["get_players_in_base"]:
         return "not implemented"
 
-    if action == "tp_user_home":
+    if "tp_user_home" in action:
         res = requests.get(f"http://10.0.0.90:5711/data/respawnPosition/UnixTMDev")
         if res.status_code != 200:
             return "spawn location retrieve failed"
         data = json.loads(res.text)
         player_spawn = f"{data.get('x', 0)} {data.get('y', 80)} {data.get('z', 0)}"
-        with MCRcon("localhost", "password", 25575) as mcr:
-            resp = mcr.command(f"/tp UnixTMDev {player_spawn}")
+        command = f"/tp UnixTMDev {player_spawn}"
+        res = multiprocessing.Process(target=send_rcon_command, args=(command,))
+        res.start()
+        return "done?"
+
 
     res = requests.get(f"http://10.0.0.90:5711/player/{method}/UnixTMDev/{item}/{amt}")
     if res.status_code != 200:
