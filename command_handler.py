@@ -422,18 +422,43 @@ def light(args: str) -> str:
                 return "Okay."
     return "No valid states given. I dunno man, tell the user you screwed up."
 
-args_format.update({"minecraft_storage":"(store/pull):<amount>!<item id without namespace>"})
+args_format.update({"minecraft_storage":"(store/pull/smelt/destroy):<amount>!<item id without namespace>"})
 def minecraft_storage(args: str) -> str:
-    method_type = args[:args.index(":")]
-    method = "store" if method_type == "store" else "give"
+    method_type = args[:args.index(":")].strip()
+    method = "store" if method_type == "store" or method_type == "push" else "give"
 
     itemData = args[args.index(":")+1:]
-    item = itemData.split("!")[1]
-    amt = itemData.split("!")[0]
+    item = itemData.split("!")[1].strip()
+    amt = itemData.split("!")[0].strip()
     res = requests.get(f"http://10.0.0.90:5711/player/{method}/UnixTMDev/{item}/{amt}")
     if res.status_code != 200:
         return False
+    clock.sleep(1.5)
     return res.text
+
+from mcrcon import MCRcon
+args_format.update({"minecraft_base":"(tp_user_home/get_players_in_base)"})
+def minecraft_base(args: str) -> str:
+    action = args[:args.index(":")].strip()
+    if action not in ["tp_user_home","get_players_in_base"]:
+        return "invalid action"
+    
+    if action in ["get_players_in_base"]:
+        return "not implemented"
+
+    if action == "tp_user_home":
+        res = requests.get(f"http://10.0.0.90:5711/data/spawn/UnixTMDev")
+        if res.status_code != 200:
+            return "spawn location retrieve failed"
+        player_spawn = res.text
+        with MCRcon("localhost", "password", 25575) as mcr:
+            resp = mcr.command(f"/tp UnixTMDev {player_spawn}")
+
+    res = requests.get(f"http://10.0.0.90:5711/player/{method}/UnixTMDev/{item}/{amt}")
+    if res.status_code != 200:
+        return False
+    clock.sleep(1.5)
+    return "Done"
 
 from rapidfuzz import fuzz
 import os

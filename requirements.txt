@@ -11,3 +11,4 @@ pokebase
 wolframalpha
 duckduckgo-search
 googlesearch-python
+mcrcon
