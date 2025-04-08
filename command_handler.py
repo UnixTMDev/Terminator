@@ -439,7 +439,7 @@ def minecraft_storage(args: str) -> str:
 from mcrcon import MCRcon
 args_format.update({"minecraft_base":"(tp_user_home/get_players_in_base)"})
 def minecraft_base(args: str) -> str:
-    action = args[:args.index(":")].strip()
+    action = args.strip()
     if action not in ["tp_user_home","get_players_in_base"]:
         return "invalid action"
     
@@ -447,10 +447,11 @@ def minecraft_base(args: str) -> str:
         return "not implemented"
 
     if action == "tp_user_home":
-        res = requests.get(f"http://10.0.0.90:5711/data/spawn/UnixTMDev")
+        res = requests.get(f"http://10.0.0.90:5711/data/respawnPosition/UnixTMDev")
         if res.status_code != 200:
             return "spawn location retrieve failed"
-        player_spawn = res.text
+        data = json.loads(res.text)
+        player_spawn = f"{data.get('x', 0)} {data.get('y', 80)} {data.get('z', 0)}"
         with MCRcon("localhost", "password", 25575) as mcr:
             resp = mcr.command(f"/tp UnixTMDev {player_spawn}")
 
