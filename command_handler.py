@@ -452,11 +452,19 @@ def send_rcon_command(command):
 args_format.update({"minecraft_base":"(tp_user_home/get_players_in_base)"})
 def minecraft_base(args: str) -> str:
     action = args.strip()
-    if action not in ["tp_user_home","get_players_in_base"]:
+
+    invalid_action = False
+    #list of valid commands
+    for x in ["tp_user_home","get_players_in_base"]:
+        if x not in action:
+            invalid_action = True
+    if invalid_action == True:
         return "invalid action"
     
-    if action in ["get_players_in_base"]:
-        return "not implemented"
+    # list of unimplemented commands
+    for x in ["get_players_in_base"]:
+        if x in action:
+            return "not implemented"
 
     if "tp_user_home" in action:
         res = requests.get(f"http://10.0.0.90:5711/data/respawnPosition/UnixTMDev")
