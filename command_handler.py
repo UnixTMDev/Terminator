@@ -95,7 +95,7 @@ async def parse(command: str) -> str:
     if (inst == "invalid" or inst == "cancel") and args.__contains__(";"):
         command = command[len(inst):]
         inst = command.split(";")[0].rstrip().lstrip().lower().replace(" ","_").replace("-","_")
-        args = command.removeprefix(command.split(";")[0].rstrip().lstrip()+";").replace(";"," ")
+        args = command.removeprefix(command.split(";")[0].rstrip().lstrip()+";").rstrip().lstrip()
     #wd = os.getcwd()
     home_dir = os.path.expanduser("~")
     os.chdir(home_dir)
@@ -458,6 +458,9 @@ def minecraft_base(args: str) -> str:
     for x in ["tp_user_home","get_players_in_base"]:
         if x not in action:
             invalid_action = True
+        if x in action:
+            invalid_action = False
+            break
     if invalid_action == True:
         return "invalid action"
     
