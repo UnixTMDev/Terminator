@@ -24,23 +24,31 @@ from imports.steam_search import get_library
 HumanResponses = True
 # Why patch out the check when I can... not do that.
 
-##TTS##
-import pyttsx3
-tts = pyttsx3.init()
-tts.setProperty("rate", SpeechRateDesired)
-def onWord(name, location, length):
-    global CutOffTTS
-    #print ('word', name, location, length)
-    if CutOffTTS:
-       engine.stop()
+loop = asyncio.new_event_loop()
 
+##TTS##
+#import pyttsx3
+#tts = pyttsx3.init()
+#tts.setProperty("rate", SpeechRateDesired)
+from yapper import Yapper, PiperSpeaker, PiperVoiceGB, PiperQuality
+
+termer = PiperSpeaker(
+    volume=0.5,
+    voice=PiperVoiceGB.NORTHERN_ENGLISH_MALE
+)
+
+yapper = Yapper(speaker=termer)
 #engine.connect('started-word', onWord)
 def say(swag):
     if type(swag) == type(None) or swag.strip() in ["", None, False, 0]:
         return
-    global tts, ui
-    tts.say(swag)
-    tts.runAndWait()
+    #global tts, ui
+    yapper.yap(swag, plain=True)
+    #tts.say(swag)
+    #loop.call_soon(tts.runAndWait)
+    #tts_thread = Thread(target=lambda: tts.iterate())
+    #tts_thread.start()
+    
     time.sleep(1.5)
 ##TTS##
 
@@ -49,6 +57,15 @@ from textual.containers import Container,Horizontal,Vertical
 from textual.widgets import Log, Label
 from textual.color import Color
 from textual.binding import Binding
+
+def getSuicideCommand():
+    from platform import system
+    if system() == "Linux" or system() == "Darwin":
+        return f"kill -9 {os.getpid()}"
+    elif system() == "Windows":
+        return f"taskkill /f {os.getpid()}"
+    else:
+        return f"kill -9 {os.getpid()}"
 
 class MyTUI(App):
     BINDINGS = [
@@ -83,13 +100,13 @@ class MyTUI(App):
         """Action to quit the app."""
         sys.exit(0)
         raise KeyboardInterrupt
-        os.system(f"kill -9 {os.getpid()}")
+        os.system(getSuicideCommand())
         self.exit()
 
     def on_shutdown(self):
         sys.exit(0)
+        os.system(getSuicideCommand())
         raise KeyboardInterrupt
-        os.system(f"kill -9 {os.getpid()}")
 
     def write(self, message):
         """Capture stdout/stderr and write to log."""
@@ -145,7 +162,7 @@ async def callbacklol(command, device="PC"):
     if not any(w in command.lower() for w in WakeWords.split(',')) and device == "PC":
         return ""
     if any(w in command.lower() for w in WakeWords.split(',')):
-        tts.stop()   
+        pass   
 
     command_list = "The valid commands and their argument formats are:"
     for x in list(cmd_parser.args_format.keys()):
@@ -233,7 +250,7 @@ async def terminator_loop():
             #print("User stopped speaking, transcribing.")
             return
 
-        with AudioToTextRecorder(spinner=False, model="medium.en", language="en",on_recording_start=lambda: asyncio.run(ui.log_message("#debug","speech start")) == tts.stop(), on_recording_stop=recording_finished, post_speech_silence_duration=1.25, no_log_file=False
+        with AudioToTextRecorder(spinner=not USE_TUI, model="medium.en", language="en",on_recording_start=lambda: asyncio.run(ui.log_message("#debug","speech start")), on_recording_stop=recording_finished, post_speech_silence_duration=1.25, no_log_file=False
             ) as recorder:
             say("Terminator active...")
             await ui.log_message("#speech","Terminator active...")
@@ -295,12 +312,30 @@ async def cmd_api_thread():
     async with websockets.serve(cmd_handler, "0.0.0.0", 5701):
         await asyncio.Future()  # run forever
 
-therminator = Thread(target=lambda: asyncio.run(terminator_loop()))
-therminator.start()
-therminator_api = Thread(target=lambda: asyncio.run(api_thread()))
-therminator_api.start()
-therminator_cmd_api = Thread(target=lambda: asyncio.run(cmd_api_thread()))
-therminator_cmd_api.start()
-time.sleep(5)
-ui.run()
+
+async def startup():
+    #ttsth = Thread(target=lambda: tts.startLoop(False))
+    #ttsth.start()
+    if USE_TUI:
+        #therminator = Thread(target=lambda: asyncio.run(terminator_loop()))
+        #therminator.start()
+        therminator_api = Thread(target=lambda: asyncio.run(api_thread()))
+        therminator_api.start()
+        therminator_cmd_api = Thread(target=lambda: asyncio.run(cmd_api_thread()))
+        therminator_cmd_api.start()
+        time.sleep(5)
+        ui_thread = Thread(target=lambda: asyncio.run(ui.run_async()))
+        ui_thread.start()
+        await terminator_loop()
+    else:
+        therminator_api = Thread(target=lambda: asyncio.run(api_thread()))
+        therminator_api.start()
+        therminator_cmd_api = Thread(target=lambda: asyncio.run(cmd_api_thread()))
+        therminator_cmd_api.start()
+        await terminator_loop()
+
+if __name__ == "__main__":
+    from multiprocessing import freeze_support
+    freeze_support()
+    asyncio.run(startup())
 # {"device":"phone","result":"Test response. Success :)"}

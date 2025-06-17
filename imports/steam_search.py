@@ -29,12 +29,16 @@ def get_library(user="UnixTMDev") -> dict:
         # {'game_count': 1234, 'games':[{ASDFDSFAFDSA} etc etc]}
         # {'appid':440, 'name': 'Team Fortress 2', 'playtime_forever': <minutes>, 'img_icon_url': 'fagfdsafsfsadfsdfdsa', 'playtime_windows_forever': 0, 'playtime_mac_forever': 0, 'playtime_linux_forever': 0, 'playtime_deck_forever': 0, 'rtime_last_played': 0, 'playtime_disconnected': 0}
     except Exception as e:
-        #print(e)
-        import json
-        game_list = ""
-        with open("./imports/fallback_library.json","r") as f:
-            game_list = f.read()
-        games = json.loads(game_list)
+        print(e)
+        try:
+            import json
+            game_list = ""
+            with open("imports/fallback_library.json","r") as f:
+                game_list = f.read()
+            games = json.loads(game_list)
+        except:
+            print(e)
+            return {}
 
     game_ids = {}
     speakable = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "

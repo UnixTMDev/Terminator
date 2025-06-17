@@ -12,3 +12,9 @@ wolframalpha
 duckduckgo-search
 googlesearch-python
 mcrcon
+pydub
+ollama
+pyttsx3
+python_weather
+textual
+yapper-tts

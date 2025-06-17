@@ -24,6 +24,9 @@ SteamExePath = "/usr/bin/env steam"
 #Wake words, comma separated. Any word may be used, must be lowercase
 WakeWords = "terminator,jarvis"
 
+#Use TUI?
+#If False, no UI is present.
+USE_TUI = True
 
 ##Home Assistant crap
 #Target device for light controls. Should be a HomeAssistant device
@@ -43,3 +46,4 @@ LLMModel = "phi4"
 ResponseModel = "phi4"
 
 from secrets_real import *
+UsersName = YourName or Gamer
